@@ -1,18 +1,25 @@
 <template>
   <div class="container">
     <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/">Home</router-link> | <router-link to="/user">User</router-link> |
+      <router-link to="/chat">Chat</router-link>
     </nav>
-    <router-view />
+    <div class="inner"><router-view /></div>
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
+nav {
+  padding: 20px;
+}
 .container {
   width: 800px;
   border: 1px solid #000;
   margin: auto;
-  padding: 20px;
+  margin-top: 50px;
+
+  .inner {
+    padding: 20px;
+  }
 }
 </style>

@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
+import mongoose from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 export const USER_TYPES = {
-  CONSUMER: "consumer",
-  SUPPORT: "support",
+  CONSUMER: 'consumer',
+  SUPPORT: 'support',
 };
 
 const userSchema = new mongoose.Schema(
   {
     _id: {
       type: String,
-      default: () => uuidv4().replace(/\-/g, ""),
+      default: () => uuidv4().replace(/\-/g, ''),
     },
     firstName: String,
     lastName: String,
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    collection: "users",
+    collection: 'users',
   }
 );
 
@@ -34,7 +34,7 @@ userSchema.statics.createUser = async function (firstName, lastName, type) {
   } catch (error) {
     throw error;
   }
-}
+};
 
 /**
  * @param {String} id, user id
@@ -43,12 +43,12 @@ userSchema.statics.createUser = async function (firstName, lastName, type) {
 userSchema.statics.getUserById = async function (id) {
   try {
     const user = await this.findOne({ _id: id });
-    if (!user) throw ({ error: 'No user with this id found' });
+    if (!user) throw { error: 'No user with this id found' };
     return user;
   } catch (error) {
     throw error;
   }
-}
+};
 
 /**
  * @return {Array} List of all users
@@ -60,7 +60,7 @@ userSchema.statics.getUsers = async function () {
   } catch (error) {
     throw error;
   }
-}
+};
 
 /**
  * @param {Array} ids, string of user ids
@@ -73,7 +73,7 @@ userSchema.statics.getUserByIds = async function (ids) {
   } catch (error) {
     throw error;
   }
-}
+};
 
 /**
  * @param {String} id - id of user
@@ -86,6 +86,6 @@ userSchema.statics.deleteByUserById = async function (id) {
   } catch (error) {
     throw error;
   }
-}
+};
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model('User', userSchema);

@@ -8,15 +8,15 @@ import UserModel from '../models/User.js';
 export default {
   initiate: async (req, res) => {
     try {
-      const validation = makeValidation(types => ({
+      const validation = makeValidation((types) => ({
         payload: req.body,
         checks: {
-          userIds: { 
-            type: types.array, 
-            options: { unique: true, empty: false, stringOnly: true } 
+          userIds: {
+            type: types.array,
+            options: { unique: true, empty: false, stringOnly: true },
           },
           type: { type: types.enum, options: { enum: CHAT_ROOM_TYPES } },
-        }
+        },
       }));
       if (!validation.success) return res.status(400).json({ ...validation });
 
@@ -26,17 +26,17 @@ export default {
       const chatRoom = await ChatRoomModel.initiateChat(allUserIds, type, chatInitiator);
       return res.status(200).json({ success: true, chatRoom });
     } catch (error) {
-      return res.status(500).json({ success: false, error: error })
+      return res.status(500).json({ success: false, error: error });
     }
   },
   postMessage: async (req, res) => {
     try {
       const { roomId } = req.params;
-      const validation = makeValidation(types => ({
+      const validation = makeValidation((types) => ({
         payload: req.body,
         checks: {
           messageText: { type: types.string },
-        }
+        },
       }));
       if (!validation.success) return res.status(400).json({ ...validation });
 
@@ -44,14 +44,19 @@ export default {
         messageText: req.body.messageText,
       };
       const currentLoggedUser = req.userId;
-      const post = await ChatMessageModel.createPostInChatRoom(roomId, messagePayload, currentLoggedUser);
+      const post = await ChatMessageModel.createPostInChatRoom(
+        roomId,
+        messagePayload,
+        currentLoggedUser
+      );
       global.io.sockets.in(roomId).emit('new message', { message: post });
       return res.status(200).json({ success: true, post });
     } catch (error) {
-      return res.status(500).json({ success: false, error: error })
+      return res.status(500).json({ success: false, error: error });
     }
   },
   getRecentConversation: async (req, res) => {
+    console.log(req.userId);
     try {
       const currentLoggedUser = req.userId;
       const options = {
@@ -59,24 +64,26 @@ export default {
         limit: parseInt(req.query.limit) || 10,
       };
       const rooms = await ChatRoomModel.getChatRoomsByUserId(currentLoggedUser);
-      const roomIds = rooms.map(room => room._id);
+      const roomIds = rooms.map((room) => room._id);
       const recentConversation = await ChatMessageModel.getRecentConversation(
-        roomIds, options, currentLoggedUser
+        roomIds,
+        options,
+        currentLoggedUser
       );
       return res.status(200).json({ success: true, conversation: recentConversation });
     } catch (error) {
-      return res.status(500).json({ success: false, error: error })
+      return res.status(500).json({ success: false, error: error });
     }
   },
   getConversationByRoomId: async (req, res) => {
     try {
       const { roomId } = req.params;
-      const room = await ChatRoomModel.getChatRoomByRoomId(roomId)
+      const room = await ChatRoomModel.getChatRoomByRoomId(roomId);
       if (!room) {
         return res.status(400).json({
           success: false,
           message: 'No room exists for this id',
-        })
+        });
       }
       const users = await UserModel.getUserByIds(room.userIds);
       const options = {
@@ -96,12 +103,12 @@ export default {
   markConversationReadByRoomId: async (req, res) => {
     try {
       const { roomId } = req.params;
-      const room = await ChatRoomModel.getChatRoomByRoomId(roomId)
+      const room = await ChatRoomModel.getChatRoomByRoomId(roomId);
       if (!room) {
         return res.status(400).json({
           success: false,
           message: 'No room exists for this id',
-        })
+        });
       }
 
       const currentLoggedUser = req.userId;
@@ -112,4 +119,4 @@ export default {
       return res.status(500).json({ success: false, error });
     }
   },
-}
+};
